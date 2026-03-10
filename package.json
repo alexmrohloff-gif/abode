@@ -1,0 +1,44 @@
+{
+  "name": "abode",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "typescript": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "tailwindcss": "3.4.14",
+    "postcss": "8.4.41",
+    "autoprefixer": "10.4.20",
+    "@prisma/client": "latest",
+    "next-auth": "^5.0.0-beta.25",
+    "@auth/prisma-adapter": "latest",
+    "bcryptjs": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "prisma": "latest",
+    "vitest": "latest"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "postinstall": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio"
+  }
+}

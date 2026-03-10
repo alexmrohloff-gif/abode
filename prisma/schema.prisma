@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  name              String?
+  firstName         String?
+  lastName          String?
+  phoneNumber       String?
+  bankAccountToken  String?
+  passwordHash      String?     // for credentials provider; null for OAuth-only users
+  emailVerified     DateTime?
+  image             String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  accounts          Account[]
+  sessions          Session[]
+  households        Household[] @relation("UserHouseholds")
+  rentShares        RentShare[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Household {
+  id         String   @id @default(cuid())
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users      User[]   @relation("UserHouseholds")
+  leases     Lease[]
+}
+
+model Lease {
+  id                String    @id @default(cuid())
+  household         Household @relation(fields: [householdId], references: [id])
+  householdId       String
+
+  propertyLabel     String
+  totalRentCents    Int
+  currency          String   @default("GBP")
+  dueDayOfMonth     Int
+
+  landlordName      String
+  landlordEmail     String?
+  landlordAccountIban String?
+
+  startDate         DateTime
+  endDate           DateTime?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  rentShares        RentShare[]
+}
+
+enum RentShareStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model RentShare {
+  id               String          @id @default(cuid())
+  lease            Lease           @relation(fields: [leaseId], references: [id])
+  leaseId          String
+  tenant           User            @relation(fields: [tenantId], references: [id])
+  tenantId         String
+
+  amountCents      Int
+  dueDate          DateTime
+  status           RentShareStatus @default(PENDING)
+  paymentDate      DateTime?
+
+  isLowFunds       Boolean         @default(false)
+  lastNotifiedAt   DateTime?
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  auditLogs        PaymentAuditLog[]
+}
+
+model PaymentAuditLog {
+  id           String      @id @default(cuid())
+  rentShare    RentShare   @relation(fields: [rentShareId], references: [id])
+  rentShareId  String
+
+  event        String
+  metadata     Json?
+
+  createdAt    DateTime    @default(now())
+}
+

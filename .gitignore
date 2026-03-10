@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build / Next
+.next/
+out/
+build/
+dist/
+
+# Env (do not commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Debug / IDE
+npm-debug.log*
+.DS_Store
+*.tsbuildinfo
+.idea/
+.vscode/
+
+# Vercel
+.vercel
+
+# Testing
+coverage/
+.nyc_output/
+
+# Prisma
+prisma/migrations/**/migration_lock.toml
