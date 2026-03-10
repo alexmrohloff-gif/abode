@@ -85,9 +85,8 @@ export function SplitConfiguration({
       };
       const parsed = splitConfigSchema.safeParse(payload);
       if (!parsed.success) {
-        const msg = parsed.error.flatten().message;
-        const err =
-          typeof msg === "string" ? msg : (msg.tenants as string[] | undefined)?.join(", ") ?? "Validation failed";
+        const flat = parsed.error.flatten();
+        const err = [...flat.formErrors, ...Object.values(flat.fieldErrors).flat()].filter(Boolean).join(", ") || "Validation failed";
         setSubmitError(err);
         onError?.(err);
         return;

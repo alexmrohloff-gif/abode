@@ -64,7 +64,9 @@ export async function updateRentShare(
 
   const parsed = updateRentShareSchema.safeParse({ shareId, ...payload });
   if (!parsed.success) {
-    return { error: parsed.error.flatten().message, success: false };
+    const flat = parsed.error.flatten();
+    const msg = [...flat.formErrors, ...Object.values(flat.fieldErrors).flat()].filter(Boolean).join(", ") || "Validation failed";
+    return { error: msg, success: false };
   }
 
   const { shareId: id, status, amountCents } = parsed.data;
@@ -207,8 +209,9 @@ export async function createLease(
     tenants: splits
   });
   if (!parsed.success) {
-    const msg = parsed.error.flatten().message;
-    return { error: typeof msg === "string" ? msg : msg.tenants?.join(", ") ?? "Validation failed", data: null };
+    const flat = parsed.error.flatten();
+    const msg = [...flat.formErrors, ...Object.values(flat.fieldErrors).flat()].filter(Boolean).join(", ") || "Validation failed";
+    return { error: msg, data: null };
   }
 
   const { totalRentPounds, propertyLabel, dueDayOfMonth, landlordName, startDate, tenants } = parsed.data;
